@@ -1,4 +1,4 @@
-<p align="center"><img width=750 alt="PowerGram" src="https://github.com/JoelGMSec/PowerGram/blob/main/PowerGram.png"></p>
+<p align="center"><img width=600 alt="PowerGram" src="https://github.com/JoelGMSec/PowerGram/blob/main/PowerGram.png"></p>
 
 # PowerGram
 **PowerGram** is a pure PowerShell Telegram Bot that can be run on Windows, Linux or Mac OS. To make use of it, you only need PowerShell 4 or higher and an internet connection.
