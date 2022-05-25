@@ -1,4 +1,4 @@
-#================================#
+﻿#================================#
 #    PowerGram by @JoelGMSec     #
 #      https://darkbyte.net      #
 #================================#
@@ -67,7 +67,7 @@ $Uri = "https://api.telegram.org/bot$($token)/getFile"
 $Response = Invoke-WebRequest $Uri -Method Post -ContentType 'application/json' -Body "{`"file_id`":`"$documentid`"}"
 $jsonpath = [array]($Response | ConvertFrom-Json).result
 $uploadpath = $jsonpath.file_path
-$Message = "Uploading $docuname.."
+$Message = "[>] Uploading $docuname.."
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html"
 if ($uploadfile -like "*$slash*") { Invoke-WebRequest "https://api.telegram.org/file/bot$($token)/$uploadpath" -OutFile $uploadfile$slash$docuname }
 else { Invoke-WebRequest "https://api.telegram.org/file/bot$($token)/$uploadpath" -OutFile $docuname }}
@@ -94,7 +94,7 @@ Write-Host "`n[!] Token not found! Please check before run PowerGram!`n" -Foregr
 Write-Host "`n[+] Ready! Waiting for new messages..`n" -ForegroundColor Green
 $Hostname = ([Environment]::MachineName).ToLower() ; $User = ([Environment]::UserName).tolower()
 $Message  = "<b>----------- PowerGram by @JoelGMSec -----------</b>`n"
-$Message += "`nNew connection from $Hostname\$User"
+$Message += "`n[>] New connection from $Hostname\$User"
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($chatID)&text=$($Message)&parse_mode=html"
 
 # Main Function
@@ -121,26 +121,35 @@ Write-Host " New message from @$username " -NoNewLine -ForegroundColor Magenta
 Write-Host "`::" -NoNewLine ; Write-Host " $text" -ForegroundColor Green }
 
 # Chat Commands
-if ($text -like "/getid*") { $Message = "Your Chat ID is $id"
+if ($interactive) { if ($id -in $chatid) { 
+if ($text -like "/exit*") { $interactive = $null ; $Message = "[>] Interactive Shell Mode is now disabled!"
+$Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html" }
+else { $command = iex $text
+$Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($command)&parse_mode=html" }}}
+else { if ($text -like "/getid*") { $Message = "Your Chat ID is $id"
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html" }
 if ($text -like "/hi*") { if ($id -in $chatid) { $Message = "Hi @$username :P"
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html" }}
 if ($text -like "/help*") { if ($id -in $chatid) { $Message  = "<b>----------- PowerGram by @JoelGMSec -----------</b>`n"
 $Message += "`nAvailable Commands:`n/hi = Say hi to PowerGram Bot`n/help = Show this help message`n/wakeonlan = Send wakeonlan command"
+$Message += "`n/shell = Enable Interactive Shell Mode`n/exit = Disable Interactive Shell Mode"
 $Message += "`n/upload = Upload file to current folder or specific one`n/download = Download file from current folder or specific one"
 $Message += "`n/exec = Execute commands on OS with PowerShell`n/getid = Obtain your Chat ID`n/kill = Kill PowerGram Bot"
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html" }}
-if ($text -like "/wakeonlan*") { if ($id -in $chatid) { $mac = $text.split(" ",2)[1] ; $Message = "Sending WOL to $mac.."
+if ($text -like "/wakeonlan*") { if ($id -in $chatid) { $mac = $text.split(" ",2)[1] ; $Message = "[>] Sending WOL to $mac.."
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html"
 $Response = wakeonlan $mac }} 
-if ($text -like "/upload*") { if ($id -in $chatid) { $document = $text.split(" ",2)[1] ; $Message = "Waiting for file.."
+if ($text -like "/shell*") { if ($id -in $chatid) { $interactive = "True" ; $Message = "[>] Interactive Shell Mode is now enabled!"
+$Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html" }}
+if ($text -like "/upload*") { if ($id -in $chatid) { $document = $text.split(" ",2)[1] ; $Message = "[>] Waiting for file.."
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html"
 $Response = sleep 10 ; upload $document }}
-if ($text -like "/download*") { if ($id -in $chatid) { $document = $text.split(" ",2)[1] ; $Message = "Sending $document.."
+if ($text -like "/download*") { if ($id -in $chatid) { $document = $text.split(" ",2)[1] ; $Message = "[>] Sending $document.."
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html" 
 $Response = download $document }}
 if ($text -like "/exec*") { if ($id -in $chatid) { $command = iex $text.split(" ",2)[1]
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($command)&parse_mode=html" }}
-if ($text -like "/kill*") { if ($id -in $chatid) { $Message = "`Killing PowerGram Bot.. Bye!"
+if ($text -like "/kill*") { if ($id -in $chatid) { $Message = "[>] Killing PowerGram Bot.. Bye!"
 $Response = Invoke-WebRequest "https://api.telegram.org/bot$($token)/sendMessage?chat_id=$($id)&text=$($Message)&parse_mode=html" 
-Write-Host "`n[!] Killing PowerGram Bot.. Bye!" -ForegroundColor Red ; exit }}}
+Write-Host "`n[!] Killing PowerGram Bot.. Bye!`n" -ForegroundColor Red ; exit }}}}
+
