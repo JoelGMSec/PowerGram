@@ -20,7 +20,7 @@ git clone https://github.com/JoelGMSec/PowerGram
 
 # Usage
 ```
-.\PowerGram -h
+.\PowerGram.ps1 -h
 
   ____                         ____                      
  |  _ \ __ __      __ __ _ __ / ___|_ __ __ _ _ __ ___   
